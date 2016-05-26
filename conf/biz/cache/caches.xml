@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<config> 
+  <!-- Row缓存: 只支持通过主键获取数据的情况 prefix: 缓存前缀 enabled: 开关 -->  
+  <row-cache> 
+    <!--
+        <cache class="demo.ddl.Demo" prefix="demo_r_"  enabled="true"  comment=""/>
+        -->  
+  </row-cache>  
+  <!-- List缓存: 基于sql语句的缓
+              sql : sql语句
+              key : 缓存key的唯一标示
+              params : sql语句参数 
+              cache-item : 缓存的列，越少越好
+              offset : 缓存区域下限
+              count : 缓存区域大小
+      -->  
+  <list-cache> 
+    <!--
+        <cache name="demo_list" class="demo.ddl.Demo" prefix="demo_l_" enabled ="true"  comment ="">
+            <sql>select id from demo where t_name=?</sql>
+            <key>id</key>
+            <params>t_name</params>
+            <cache-item>id</cache-item>
+            <offset>0</offset>
+            <count>10</count>
+        </cache>
+        -->  
+    </list-cache> 
+</config>

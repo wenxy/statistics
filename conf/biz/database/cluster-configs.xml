@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--           
+    shard-type:  分库类型
+    range: 范围分库
+    hash :  取模分库
+    hash-str : string取模分库（用户中心取模算法）
+    shard-column: 分库字段
+-->
+<configs> 
+  <!--
+        <config class="demo.ddl.Demo" source="mysql" shard-type="hash"
+            shard-column="id" comment="测试">
+            <map client="vdb_01">0</map>
+            <map client="vdb_02">1</map>
+        </config>
+        -->  
+  <!--
+        <config class="demo.ddl.Demo" source="mysql" shard-type="none"
+            comment="测试-不分库场景">
+            <map client="vdb_01">0</map>
+        </config>
+
+        <config class="demo.ddl.Demo" source="mysql" shard-type="range"
+            shard-column="id" comment="测试-按范围分库">
+            <map client="vdb_01">0-100</map>
+            <map client="vdb_02">100-9223372036854775807</map>
+        </config>
+
+        <config class="demo.ddl.Demo" source="mysql" shard-type="range"
+            shard-column="id" comment="测试-按范围分库">
+            <map client="vdb_01">0-100</map>
+            <map client="vdb_02">100-9223372036854775807</map>
+        </config>
+
+        <config class="demo.ddl.Demo" source="mysql" shard-type="hash-string"
+            shard-column="t_name" substring="0,16" comment="测试-对字符串，按hash-string分库">
+            <map client="vdb_01">0</map>
+            <map client="vdb_02">1</map>
+        </config>
+
+        <config class="demo.ddl.Demo" source="mysql" shard-type="range-hash"
+            shard-column="id" comment="测试-hash+rang分库">
+            <range map="0-10000000" >
+                <map client="vdb_01">0</map>
+                <map client="vdb_02">1</map>
+            </range>
+            <range map="10000001-9223372036854775807" >
+                <map client="vdb_01">0</map>
+                <map client="vdb_02">1</map>
+            </range>
+        </config>
+        -->  
+   
+</configs>
