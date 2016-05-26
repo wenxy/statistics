@@ -42,7 +42,6 @@ public class UcmqWorker extends WorkerInvocation{
 			Logger.error("UcmqWorker.onTask check message invalid %s", message);
 			return ;
 		}*/
-		
 		//先根据业务获取是否定义特殊实现，找不到则使用默认工厂
 		String caller = message.get("caller").getAsString();
 		String action = message.get("action").getAsString();
@@ -52,11 +51,11 @@ public class UcmqWorker extends WorkerInvocation{
 		try {
 			 wf = (IWriteFactory)Jws.classloader.loadClass(implClass).newInstance();
 		} catch (InstantiationException e) {
-			 Logger.error(e,"");
+			  
 		} catch (IllegalAccessException e) {
-			 Logger.error(e,"");
+			 
 		} catch (ClassNotFoundException e) {
-			 Logger.error(e,"");
+			  
 		}
 		
 		if(wf == null){//找不到则使用默认工厂

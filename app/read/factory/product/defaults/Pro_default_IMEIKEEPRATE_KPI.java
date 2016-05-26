@@ -1,4 +1,4 @@
-package read.product.defaults;
+package read.factory.product.defaults;
 
 import interfaces.IReadWrite;
 

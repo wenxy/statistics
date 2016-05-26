@@ -22,24 +22,24 @@ public class FactoryDEFAULTAction implements IWriteFactory {
 		}
 		
 		String name = "Pro_"+caller+"_"+action.raw().toUpperCase();
-		String packages = "write.factory.product."+caller;
-		String implClass = packages+"."+name;
+		String packages = "write.factory.product";
+		String implClass = packages+"."+caller+"."+name;
 		IWrite write = null;
 		try {
 			write = (IWrite)Jws.classloader.loadClass(implClass).newInstance();
 		} catch (InstantiationException e) {
-			Logger.error(e, "InstantiationException");
+			
 		} catch (IllegalAccessException e) {
-			Logger.error(e, "IllegalAccessException");
+			
 		} catch (ClassNotFoundException e) {
-			Logger.error(e, "ClassNotFoundException");
+			
 		}
 		if(write != null){
 			return write;
 		}
 		
 		//没有实现则使用默认实现处理		
-		implClass = packages+".Prod_default_"+action.raw().toUpperCase();;
+		implClass = packages+".defaults"+".Pro_default_"+action.raw().toUpperCase();;
 		try {
 			write = (IWrite)Jws.classloader.loadClass(implClass).newInstance();
 		} catch (InstantiationException e) {
