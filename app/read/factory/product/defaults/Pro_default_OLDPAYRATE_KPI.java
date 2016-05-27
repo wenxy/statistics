@@ -15,28 +15,27 @@ public class Pro_default_OLDPAYRATE_KPI extends IReadWrite{
 	@Override
 	public String read(String caller,String date, int gameId, String ch) {
 		try{
-			//先查舊付費用戶數
-			long oldpaycount = 0;
-			String oldPayuser_skey = RedisUtil.apply(date, ch, gameId, KPI.OLDPAYUSER_KPI.raw());
-			String oldPayUser_ckey = RedisUtil.apply(date, ch, gameId, Action.PAY_ACTION.raw(),KPI.OLDPAYUSER_KPI.raw());//计算key caculateKey
-
-			String oldPayUseredisResult = readFromRedis(oldPayuser_skey);
-			if(!StringUtils.isEmpty(oldPayUseredisResult) && !isToday(date)){//查询当天的话，不走缓存，因为数据在实时变化ing
-				oldpaycount = Long.parseLong(oldPayUseredisResult);
+			//计算旧用户登录数
+			String skeyLogin = RedisUtil.apply(date, ch, gameId, KPI.OLDUIDLOGIN_KPI.raw());
+			String ckeyLogin = RedisUtil.apply(date, ch, gameId, Action.LOGIN_ACTION.raw(),KPI.UIDLOGIN_KPI.raw());//计算key caculateKey
+  			long oldLogincount = 0;
+			String loginRedisResult = readFromRedis(skeyLogin);
+			if(!StringUtils.isEmpty(loginRedisResult) && !isToday(date)){//查询当天的话，不走缓存，因为数据在实时变化ing
+				oldLogincount = Long.parseLong(loginRedisResult);
 			}
 			
-			if(oldpaycount == 0){
-				File file = getReadStoreFile(caller,date,gameId,ch,Action.PAY_ACTION.raw(),KPI.OLDPAYUSER_KPI.raw());
+			if(oldLogincount == 0){
+				File file = getReadStoreFile(caller,date,gameId,ch,Action.LOGIN_ACTION.raw(),KPI.OLDUIDLOGIN_KPI.raw());
 				//计算数 
-				oldpaycount = caculateSingleSize(file,oldPayUser_ckey,MQInstance.BASE);
-				writeToRedis(oldPayuser_skey,String.valueOf(oldpaycount),KPI_CACHE_SEC);
+				oldLogincount = caculateSingleSize(file,ckeyLogin,MQInstance.BASE);
+				writeToRedis(skeyLogin,String.valueOf(oldLogincount),KPI_CACHE_SEC);
 			}
 			
-			if(oldpaycount == 0){
+			if(oldLogincount == 0){
 				return "0";
 			}
 			
-			//總付費用戶數 
+			//总付费用户数
 			String skey = RedisUtil.apply(date, ch, gameId, KPI.PAYUSER_KPI.raw());
 			String ckey = RedisUtil.apply(date, ch, gameId, Action.PAY_ACTION.raw(),KPI.PAYUSER_KPI.raw());//计算key caculateKey
 			long payCount = 0;
@@ -50,7 +49,7 @@ public class Pro_default_OLDPAYRATE_KPI extends IReadWrite{
 				payCount = caculateSingleSize(file,ckey,MQInstance.BASE);
 				writeToRedis(skey,String.valueOf(payCount),KPI_CACHE_SEC);
 			} 
-			return String.valueOf(oldpaycount/payCount);
+			return String.valueOf(oldLogincount/payCount);
 		}catch(Exception e){
 			Logger.error(e, "0");
 		}

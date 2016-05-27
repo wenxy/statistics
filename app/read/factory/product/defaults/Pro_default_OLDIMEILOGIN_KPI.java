@@ -19,53 +19,28 @@ public class Pro_default_OLDIMEILOGIN_KPI extends IReadWrite{
 	@Override
 	public String read(String caller,String date, int gameId, String ch) {
 		try{
-			//先查登錄用戶數
-			long imeiLoginNum = 0;
-			String imeiLogin_skey = RedisUtil.apply(date, ch, gameId, KPI.IMEILOGIN_KPI.raw());
-			String imeiLogin_ckey = RedisUtil.apply(date, ch, gameId, Action.LOGIN_ACTION.raw(),KPI.IMEILOGIN_KPI.raw());//计算key caculateKey
 
-			String imeiLogin_redisResult = readFromRedis(imeiLogin_skey);
-			if(!StringUtils.isEmpty(imeiLogin_redisResult) && !isToday(date)){//查询当天的话，不走缓存，因为数据在实时变化ing
-				imeiLoginNum = Long.parseLong(imeiLogin_redisResult);
+			String skeyLogin = RedisUtil.apply(date, ch, gameId, KPI.OLDIMEILOGIN_KPI.raw());
+			String ckeyLogin = RedisUtil.apply(date, ch, gameId, Action.LOGIN_ACTION.raw(),KPI.UIDLOGIN_KPI.raw());//计算key caculateKey
+  			long oldLogincount = 0;
+			String loginRedisResult = readFromRedis(skeyLogin);
+			if(!StringUtils.isEmpty(loginRedisResult) && !isToday(date)){//查询当天的话，不走缓存，因为数据在实时变化ing
+				oldLogincount = Long.parseLong(loginRedisResult);
 			}
 			
-			if(imeiLoginNum == 0){
-				File file = getReadStoreFile(caller,date,gameId,ch,Action.LOGIN_ACTION.raw(),KPI.IMEILOGIN_KPI.raw());
-				imeiLoginNum = caculateSingleSize(file,imeiLogin_ckey,MQInstance.BASE);
-				writeToRedis(imeiLogin_skey,String.valueOf(imeiLoginNum),KPI_CACHE_SEC);
-			}
-			
-			if(imeiLoginNum==0){
-				return "0";
-			}
-
-			////////計算新用戶登錄數
-			String skey = RedisUtil.apply(date, ch, gameId, KPI.NEWIMEILOGIN_KPI.raw());
-			String ckeyLogin = RedisUtil.apply(date, ch, gameId, Action.LOGIN_ACTION.raw(),KPI.IMEILOGIN_KPI.raw());//计算key caculateKey
-			String ckeyReg = RedisUtil.apply(date, ch, gameId, Action.REG_ACTION.raw(),KPI.IMEIREG_KPI.raw());//计算key caculateKey
-			String[] ckeys = new String[]{ckeyLogin,ckeyReg};
-			long count = 0;
-			String redisResult = readFromRedis(skey);
-			if(!StringUtils.isEmpty(redisResult) && !isToday(date)){//查询当天的话，不走缓存，因为数据在实时变化ing
-				count = Long.parseLong(redisResult); 
-			}
-			
-			if(count == 0){			
-				File fileLogin = getReadStoreFile(caller,date,gameId,ch,Action.LOGIN_ACTION.raw(),KPI.IMEILOGIN_KPI.raw());
-				File fileReg = getReadStoreFile(caller,date,gameId,ch,Action.REG_ACTION.raw(),KPI.IMEIREG_KPI.raw());
-				File[] files = new File[]{fileLogin,fileReg};
-				
+			if(oldLogincount == 0){
+				File file = getReadStoreFile(caller,date,gameId,ch,Action.LOGIN_ACTION.raw(),KPI.OLDIMEILOGIN_KPI.raw());
 				//计算数 
-				count = caculateMultiSize(files,ckeys,MQInstance.BASE);
-				writeToRedis(skey,String.valueOf(count),KPI_CACHE_SEC);
+				oldLogincount = caculateSingleSize(file,ckeyLogin,MQInstance.BASE);
+				writeToRedis(skeyLogin,String.valueOf(oldLogincount),KPI_CACHE_SEC);
 			}
 			
-			if(count > imeiLoginNum){
-				Logger.error("Pro_default_OLDIMEILOGIN_KPI.read  Impossible,newimeilogin[%s]>imeiloginnum[%]", count,imeiLoginNum);
+			if(oldLogincount == 0){
 				return "0";
 			}
 			
-			return String.valueOf(imeiLoginNum-count);
+			return String.valueOf(oldLogincount);
+		
 		}catch(Exception e){
 			Logger.error(e, "0");
 		}

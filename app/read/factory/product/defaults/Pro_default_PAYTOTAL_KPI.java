@@ -27,10 +27,10 @@ public class Pro_default_PAYTOTAL_KPI extends IReadWrite{
 			String line = readLine(file); 
  			writeToRedis(skey,line.trim(),KPI_CACHE_SEC);
 			
-			return line.trim();
+			return StringUtils.isEmpty(line)?"0":line.trim();
 		}catch(Exception e){
 			Logger.error(e, "0");
 		}
-		return "";
+		return "0";
 	}
 }

@@ -22,26 +22,29 @@ public class Pro_default_NEWUIDLOGIN_KPI extends IReadWrite{
 	@Override
 	public String read(String caller,String date, int gameId, String ch) {
 		try{
-			String skey = RedisUtil.apply(date, ch, gameId, KPI.NEWUIDLOGIN_KPI.raw());
-			
+
+			String skeyLogin = RedisUtil.apply(date, ch, gameId, KPI.NEWUIDLOGIN_KPI.raw());
 			String ckeyLogin = RedisUtil.apply(date, ch, gameId, Action.LOGIN_ACTION.raw(),KPI.UIDLOGIN_KPI.raw());//计算key caculateKey
-			String ckeyReg = RedisUtil.apply(date, ch, gameId, Action.REG_ACTION.raw(),KPI.UIDREG_KPI.raw());//计算key caculateKey
-			String[] ckeys = new String[]{ckeyLogin,ckeyReg};
-			
-			String redisResult = readFromRedis(skey);
-			if(!StringUtils.isEmpty(redisResult) && !isToday(date)){//查询当天的话，不走缓存，因为数据在实时变化ing
-				return redisResult;
+  			long newLogincount = 0;
+			String loginRedisResult = readFromRedis(skeyLogin);
+			if(!StringUtils.isEmpty(loginRedisResult) && !isToday(date)){//查询当天的话，不走缓存，因为数据在实时变化ing
+				newLogincount = Long.parseLong(loginRedisResult);
 			}
 			
-			File fileLogin = getReadStoreFile(caller,date,gameId,ch,Action.LOGIN_ACTION.raw(),KPI.UIDLOGIN_KPI.raw());
-			File fileReg = getReadStoreFile(caller,date,gameId,ch,Action.REG_ACTION.raw(),KPI.UIDREG_KPI.raw());
-			File[] files = new File[]{fileLogin,fileReg};
+			if(newLogincount == 0){
+				File file = getReadStoreFile(caller,date,gameId,ch,Action.LOGIN_ACTION.raw(),KPI.NEWUIDLOGIN_KPI.raw());
+				//计算数 
+				newLogincount = caculateSingleSize(file,ckeyLogin,MQInstance.BASE);
+				writeToRedis(skeyLogin,String.valueOf(newLogincount),KPI_CACHE_SEC);
+			}
 			
-			//计算数 
-			long count = caculateMultiSize(files,ckeys,MQInstance.BASE);
-			writeToRedis(skey,String.valueOf(count),KPI_CACHE_SEC);
+			if(newLogincount == 0){
+				return "0";
+			}
 			
-			return String.valueOf(count);
+			return String.valueOf(newLogincount);
+			
+		
 		}catch(Exception e){
 			Logger.error(e, "0");
 		}

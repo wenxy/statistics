@@ -34,7 +34,7 @@ public abstract class IReadWrite implements IWrite,IRead{
 	protected static final int KPI_CACHE_SEC=3*24*60*60;
  	@Override
 	public String read(String caller,String date,int gameId,String ch){
-		return null;
+		return "0";
 	}
 	@Override
 	public void write(JsonObject json){

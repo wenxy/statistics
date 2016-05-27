@@ -49,7 +49,28 @@ public class Pro_default_LOGIN_ACTION extends IReadWrite{
 				FileUtil.write(store2, uid+NEW_LINE, true);
 				redis.setAtExpire(uidkey, "1", RedisUtil.unixTimeSince(date, 1));//一天后失效
 			}
-		
+			
+			String newUidLoginKey = RedisUtil.apply(date, ch, gameId, String.valueOf(uid),KPI.UIDREG_KPI.raw());
+			String newUidLoginValue = redis.get(newUidLoginKey);
+			boolean newUidLogin = (!StringUtils.isEmpty(newUidLoginValue) && newUidLoginValue.equals("1"))?true:false;
+			if(newUidLogin){
+				File store = getWriteStoreFile( caller, date, gameId, ch, action,KPI.NEWUIDLOGIN_KPI.raw());
+				FileUtil.write(store, uid+NEW_LINE, true);
+ 			}else{
+ 				File store = getWriteStoreFile( caller, date, gameId, ch, action,KPI.OLDUIDLOGIN_KPI.raw());
+				FileUtil.write(store, uid+NEW_LINE, true);
+			}
+			 
+			String newImeiLoginKey = RedisUtil.apply(date, ch, gameId, String.valueOf(uid),KPI.IMEIREG_KPI.raw());
+			String newImeiLoginValue = redis.get(newImeiLoginKey);
+			boolean newImeiLogin = (!StringUtils.isEmpty(newImeiLoginValue) && newImeiLoginValue.equals("1"))?true:false;
+			if(newImeiLogin){
+				File store = getWriteStoreFile( caller, date, gameId, ch, action,KPI.NEWIMEILOGIN_KPI.raw());
+				FileUtil.write(store, uid+NEW_LINE, true);
+			}else{
+				File store = getWriteStoreFile( caller, date, gameId, ch, action,KPI.OLDIMEILOGIN_KPI.raw());
+				FileUtil.write(store, uid+NEW_LINE, true);
+			}
 		}catch(Exception e){
 			Logger.error(e, "ShunwanLogin.write exception %s",e.getMessage());
 		}

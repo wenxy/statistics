@@ -34,8 +34,12 @@ public class Pro_default_REG_ACTION extends IReadWrite{
 			
 			//新用户写入redis，方便pay统计算是否新用户支付
 			ValueRedisTemplate redis = ValueRedisTemplate.getInstance(MQInstance.BASE);
-			String key = RedisUtil.apply(date, ch, gameId, String.valueOf(uid),KPI.UIDREG_KPI.raw());
-			redis.setAtExpire(key, "1", RedisUtil.unixTimeSince(date, 1));
+			String uidkey = RedisUtil.apply(date, ch, gameId, String.valueOf(uid),KPI.UIDREG_KPI.raw());
+			redis.setAtExpire(uidkey, "1", RedisUtil.unixTimeSince(date, 100));//可以用日志恢复100天前的数据
+			
+			//暂没用到判断imei新用户
+			String imeikey = RedisUtil.apply(date, ch, gameId, String.valueOf(uid),KPI.IMEIREG_KPI.raw());
+			redis.setAtExpire(imeikey, "1", RedisUtil.unixTimeSince(date, 100));
 			
 		}catch(Exception e){
 			Logger.error(e, "ShunwanReg.write exception %s",e.getMessage());
