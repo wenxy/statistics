@@ -20,8 +20,8 @@ public class Pro_default_NEWIMEILOGIN_KPI extends IReadWrite{
 	@Override
 	public String read(String caller,String date, int gameId, String ch) {
 		try{
-			String skeyLogin = RedisUtil.apply(date, ch, gameId, KPI.OLDUIDLOGIN_KPI.raw());
-			String ckeyLogin = RedisUtil.apply(date, ch, gameId, Action.LOGIN_ACTION.raw(),KPI.UIDLOGIN_KPI.raw());//计算key caculateKey
+			String skeyLogin = RedisUtil.apply(date, ch, gameId, KPI.NEWIMEILOGIN_KPI.raw());
+			String ckeyLogin = RedisUtil.apply(date, ch, gameId, Action.LOGIN_ACTION.raw(),KPI.NEWIMEILOGIN_KPI.raw());//计算key caculateKey
   			long newLogincount = 0;
 			String loginRedisResult = readFromRedis(skeyLogin);
 			if(!StringUtils.isEmpty(loginRedisResult) && !isToday(date)){//查询当天的话，不走缓存，因为数据在实时变化ing
@@ -29,7 +29,7 @@ public class Pro_default_NEWIMEILOGIN_KPI extends IReadWrite{
 			}
 			
 			if(newLogincount == 0){
-				File file = getReadStoreFile(caller,date,gameId,ch,Action.LOGIN_ACTION.raw(),KPI.OLDUIDLOGIN_KPI.raw());
+				File file = getReadStoreFile(caller,date,gameId,ch,Action.LOGIN_ACTION.raw(),KPI.NEWIMEILOGIN_KPI.raw());
 				//计算数 
 				newLogincount = caculateSingleSize(file,ckeyLogin,MQInstance.BASE);
 				writeToRedis(skeyLogin,String.valueOf(newLogincount),KPI_CACHE_SEC);

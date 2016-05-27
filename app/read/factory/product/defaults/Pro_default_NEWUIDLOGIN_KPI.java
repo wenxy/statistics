@@ -24,7 +24,7 @@ public class Pro_default_NEWUIDLOGIN_KPI extends IReadWrite{
 		try{
 
 			String skeyLogin = RedisUtil.apply(date, ch, gameId, KPI.NEWUIDLOGIN_KPI.raw());
-			String ckeyLogin = RedisUtil.apply(date, ch, gameId, Action.LOGIN_ACTION.raw(),KPI.UIDLOGIN_KPI.raw());//计算key caculateKey
+			String ckeyLogin = RedisUtil.apply(date, ch, gameId, Action.LOGIN_ACTION.raw(),KPI.NEWUIDLOGIN_KPI.raw());//计算key caculateKey
   			long newLogincount = 0;
 			String loginRedisResult = readFromRedis(skeyLogin);
 			if(!StringUtils.isEmpty(loginRedisResult) && !isToday(date)){//查询当天的话，不走缓存，因为数据在实时变化ing

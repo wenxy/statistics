@@ -21,7 +21,7 @@ public class Pro_default_OLDUIDLOGIN_KPI extends IReadWrite{
 		try{
 			//计算旧用户登录数
 			String skeyLogin = RedisUtil.apply(date, ch, gameId, KPI.OLDUIDLOGIN_KPI.raw());
-			String ckeyLogin = RedisUtil.apply(date, ch, gameId, Action.LOGIN_ACTION.raw(),KPI.UIDLOGIN_KPI.raw());//计算key caculateKey
+			String ckeyLogin = RedisUtil.apply(date, ch, gameId, Action.LOGIN_ACTION.raw(),KPI.OLDUIDLOGIN_KPI.raw());//计算key caculateKey
   			long oldLogincount = 0;
 			String loginRedisResult = readFromRedis(skeyLogin);
 			if(!StringUtils.isEmpty(loginRedisResult) && !isToday(date)){//查询当天的话，不走缓存，因为数据在实时变化ing

@@ -15,9 +15,32 @@ public class Pro_default_OLDPAYRATE_KPI extends IReadWrite{
 	@Override
 	public String read(String caller,String date, int gameId, String ch) {
 		try{
-			//计算旧用户登录数
+			
+			//查旧用户付费数
+			long oldpaycount = 0;
+			String oldpayuser_skey = RedisUtil.apply(date, ch, gameId, KPI.OLDPAYUSER_KPI.raw());
+			String oldpayUser_ckey = RedisUtil.apply(date, ch, gameId, Action.PAY_ACTION.raw(),KPI.OLDPAYUSER_KPI.raw());//计算key caculateKey
+
+			String oldpayUseredisResult = readFromRedis(oldpayuser_skey);
+			if(!StringUtils.isEmpty(oldpayUseredisResult) && !isToday(date)){//查询当天的话，不走缓存，因为数据在实时变化ing
+				oldpaycount = Long.parseLong(oldpayUseredisResult);
+			}
+			
+			if(oldpaycount == 0){
+				File file = getReadStoreFile(caller,date,gameId,ch,Action.PAY_ACTION.raw(),KPI.OLDPAYUSER_KPI.raw());
+				//计算数 
+				oldpaycount = caculateSingleSize(file,oldpayUser_ckey,MQInstance.BASE);
+				writeToRedis(oldpayuser_skey,String.valueOf(oldpaycount),KPI_CACHE_SEC);
+			}
+			
+			if(oldpaycount == 0){
+				return "0";
+			}
+			
+			
+			//计算旧活跃用户数
 			String skeyLogin = RedisUtil.apply(date, ch, gameId, KPI.OLDUIDLOGIN_KPI.raw());
-			String ckeyLogin = RedisUtil.apply(date, ch, gameId, Action.LOGIN_ACTION.raw(),KPI.UIDLOGIN_KPI.raw());//计算key caculateKey
+			String ckeyLogin = RedisUtil.apply(date, ch, gameId, Action.LOGIN_ACTION.raw(),KPI.OLDUIDLOGIN_KPI.raw());//计算key caculateKey
   			long oldLogincount = 0;
 			String loginRedisResult = readFromRedis(skeyLogin);
 			if(!StringUtils.isEmpty(loginRedisResult) && !isToday(date)){//查询当天的话，不走缓存，因为数据在实时变化ing
@@ -35,21 +58,8 @@ public class Pro_default_OLDPAYRATE_KPI extends IReadWrite{
 				return "0";
 			}
 			
-			//总付费用户数
-			String skey = RedisUtil.apply(date, ch, gameId, KPI.PAYUSER_KPI.raw());
-			String ckey = RedisUtil.apply(date, ch, gameId, Action.PAY_ACTION.raw(),KPI.PAYUSER_KPI.raw());//计算key caculateKey
-			long payCount = 0;
-			String redisResult = readFromRedis(skey);
-			if(!StringUtils.isEmpty(redisResult) && !isToday(date)){//查询当天的话，不走缓存，因为数据在实时变化ing
-				payCount = Long.parseLong(redisResult);
-			}
-			if(payCount == 0){
-				File file = getReadStoreFile(caller,date,gameId,ch,Action.PAY_ACTION.raw(),KPI.PAYUSER_KPI.raw());
-				//计算数 
-				payCount = caculateSingleSize(file,ckey,MQInstance.BASE);
-				writeToRedis(skey,String.valueOf(payCount),KPI_CACHE_SEC);
-			} 
-			return String.valueOf(oldLogincount/payCount);
+			 
+			return String.valueOf(oldpaycount/oldLogincount);
 		}catch(Exception e){
 			Logger.error(e, "0");
 		}
