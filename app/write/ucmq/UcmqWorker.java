@@ -14,7 +14,7 @@ import jws.mq.WorkerInvocation;
 import utils.UcmqSignUtil;
 import write.IWrite;
 import write.factory.IWriteFactory;
-import write.factory.impl.FactoryDEFAULTAction;
+import write.factory.impl.Factory_DEFAULT_ACTION;
 /*
  {
  	"caller":"sdksz",
@@ -45,7 +45,7 @@ public class UcmqWorker extends WorkerInvocation{
 		//先根据业务获取是否定义特殊实现，找不到则使用默认工厂
 		String caller = message.get("caller").getAsString();
 		String action = message.get("action").getAsString();
-		String implClass = Jws.configuration.getProperty("action.write.impl","write.factory.impl")+".Factory_"+action.toUpperCase()+"Action";
+		String implClass = Jws.configuration.getProperty("action.write.impl","write.factory.impl")+".Factory_"+action.toUpperCase()+"_ACTION";
 		
 		IWriteFactory wf = null;
 		try {
@@ -60,7 +60,7 @@ public class UcmqWorker extends WorkerInvocation{
 		
 		if(wf == null){//找不到则使用默认工厂
 			Logger.info("UcmqWorker.onTask  using default factory=%s", "write.factory.impl.FactoryDEFAULTAction");
-			wf = new FactoryDEFAULTAction();
+			wf = new Factory_DEFAULT_ACTION();
 		}
 		
 		IWrite writer = wf.getWriteInstance(caller, Action.find(action));

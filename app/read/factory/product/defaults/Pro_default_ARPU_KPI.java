@@ -1,6 +1,8 @@
 package read.factory.product.defaults;
 
 import java.io.File;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -10,11 +12,35 @@ import constants.MQInstance;
 import interfaces.IReadWrite;
 import jws.Logger;
 import utils.RedisUtil;
+/**
+ * 人均付費 元
+ * @author fish
+ *
+ */
+public class Pro_default_ARPU_KPI extends IReadWrite{
 
-public class Pro_default_PAYRATE_KPI extends IReadWrite{
 	@Override
 	public String read(String caller,String date, int gameId, String ch) {
 		try{
+			
+			double payTotal = 0.0;
+			String payTotal_skey = RedisUtil.apply(date, ch, gameId, KPI.PAYTOTAL_KPI.raw());
+			String payTotalredisResult = readFromRedis(payTotal_skey);
+			if(!StringUtils.isEmpty(payTotalredisResult) && !isToday(date)){//查询当天的话，不走缓存，因为数据在实时变化ing
+				payTotal = Double.parseDouble(payTotalredisResult);
+			}
+			
+			if(payTotal == 0){
+				File file = getReadStoreFile(caller,date,gameId,ch,Action.PAY_ACTION.raw(),KPI.PAYTOTAL_KPI.raw());
+				String line = readLine(file); 
+	 			writeToRedis(payTotal_skey,line.trim(),KPI_CACHE_SEC);
+	 			payTotal = Double.parseDouble(line);
+			}
+			
+			if(payTotal == 0){
+				return "0";
+			}
+			
 			//登錄用戶數
 			String uidLoginskey = RedisUtil.apply(date, ch, gameId, KPI.UIDLOGIN_KPI.raw());
 			String uidLoginckey = RedisUtil.apply(date, ch, gameId, Action.LOGIN_ACTION.raw(),KPI.UIDLOGIN_KPI.raw());//计算key caculateKey
@@ -32,25 +58,18 @@ public class Pro_default_PAYRATE_KPI extends IReadWrite{
 			if(loginCount == 0){
 				return "0";
 			}
-			//付費用戶數
-			String skey = RedisUtil.apply(date, ch, gameId, KPI.PAYUSER_KPI.raw());
-			String ckey = RedisUtil.apply(date, ch, gameId, Action.PAY_ACTION.raw(),KPI.PAYUSER_KPI.raw());//计算key caculateKey
+			return String.valueOf(payTotal/loginCount);
 			
-			String redisResult = readFromRedis(skey);
-			if(!StringUtils.isEmpty(redisResult) && !isToday(date)){//查询当天的话，不走缓存，因为数据在实时变化ing
-				return redisResult;
-			}
-			
-			File file = getReadStoreFile(caller,date,gameId,ch,Action.PAY_ACTION.raw(),KPI.PAYUSER_KPI.raw());
-
-			//计算数 
-			long count = caculateSingleSize(file,ckey,MQInstance.BASE);
-			writeToRedis(skey,String.valueOf(count),KPI_CACHE_SEC);
-			
-			return String.valueOf(count/loginCount);
 		}catch(Exception e){
 			Logger.error(e, "");
 		}
 		return "0";
 	} 
+	/*public static void main(String[] args){
+		double x = 3004.43;
+		long y = 10;
+		NumberFormat nf = new DecimalFormat("##.##");
+		System.out.println(nf.format(x/y));
+	}*/
+
 }

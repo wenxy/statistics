@@ -24,7 +24,7 @@ public class RedisUtil {
 	 * @return
 	 * @throws Exception
 	 */
-	public static String apply(String date,String ch,int gameId,String ext) throws Exception{
+	public static String apply(String date,String ch,int gameId,String... exts) throws Exception{
 	
 		if(StringUtils.isEmpty(date) ||
 				StringUtils.isEmpty(ch) ||
@@ -32,9 +32,16 @@ public class RedisUtil {
 			throw new Exception("RedisKeyUtil.apply Invalid param.");
 		}
 		
-		if(!StringUtils.isEmpty(ext)){
-			return new StringBuffer(date).append("_").append(gameId).append("_").append(ch).append("_").append(ext)
-				.toString();
+		if(exts != null && exts.length>0){
+			StringBuffer keySb =  new StringBuffer(date).append("_").append(gameId).append("_").append(ch).append("_");
+			for(int i=0;i<exts.length;i++){
+				if(i==exts.length-1){
+					keySb.append(exts[i]);
+				}else{
+					keySb.append(exts[i]).append("_");
+				}
+			}
+			return keySb.toString();
 		}
 		
 		return new StringBuffer(date).append("_").append(gameId).append("_").append(ch)

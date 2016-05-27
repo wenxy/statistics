@@ -169,20 +169,21 @@ public class KpiQuery extends Controller {
 				if (StringUtils.isEmpty(kpi)) {
 					continue;
 				}
-				String kpiImplCalss = Jws.configuration.getProperty("kpi.read.impl", "read.factory.impl") + ".Factory_"
+				String kpiImplCalss = Jws.configuration.getProperty("kpi.read.impl", "read.factory.impl")+"."+caller + ".Factory_"
 						+ kpi.toUpperCase() + "_KPI";
 				IReadFactory rf = null;
 				try {
 					rf = (IReadFactory) Jws.classloader.loadClass(kpiImplCalss).newInstance();
 				} catch (InstantiationException e) {
-					Logger.error(e, "");
+					 
 				} catch (IllegalAccessException e) {
-					Logger.error(e, "");
+					 
 				} catch (ClassNotFoundException e) {
-					Logger.error(e, "");
+					 
 				}
 
 				if (rf == null) {
+					Logger.info("KPI.query -> using default factory kpi impl->%s", "read.factory.impl.Factory_DEFAULT_KPI");
 					rf = new Factory_DEFAULT_KPI();
 				}
 				IRead read = rf.getReadInstance(caller, KPI.find(kpi));

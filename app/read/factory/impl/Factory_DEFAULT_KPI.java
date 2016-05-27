@@ -12,16 +12,16 @@ public class Factory_DEFAULT_KPI implements IReadFactory {
 	@Override
 	public  IRead getReadInstance(String caller,KPI kpi){
 		if(StringUtils.isEmpty(caller)){
-			Logger.error("FactoryDEFAULTAction.getReadInstance caller not define.");
+			Logger.error("Factory_DEFAULT_KPI.getReadInstance caller not define.");
 			return null;
 		}
 		
 		if(kpi == null){
-			Logger.error("FactoryDEFAULTAction.getReadInstance kpi not define,caller = %s", caller);
+			Logger.error("Factory_DEFAULT_KPI.getReadInstance kpi not define,caller = %s", caller);
 			return null;
 		}
 		
-		String name = "Pro_"+caller+"_"+kpi.raw().toUpperCase()+"_KPI";
+		String name = "Pro_"+caller+"_"+kpi.forClassName();
 		String packages = "read.factory.product";
 		String implClass = packages+"."+caller+"."+name;
 		IRead read = null;
@@ -39,7 +39,7 @@ public class Factory_DEFAULT_KPI implements IReadFactory {
 		}
 		
 		//没有实现则使用默认实现处理		
-		implClass = packages+".defaults"+".Pro_default_"+kpi.raw().toUpperCase()+"_KPI";
+		implClass = packages+".defaults"+".Pro_default_"+kpi.forClassName();
 		try {
 			read = (IRead)Jws.classloader.loadClass(implClass).newInstance();
 		} catch (InstantiationException e) {

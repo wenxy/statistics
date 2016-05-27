@@ -8,7 +8,7 @@ import jws.Logger;
 import write.IWrite;
 import write.factory.IWriteFactory;
 
-public class FactoryDEFAULTAction implements IWriteFactory {
+public class Factory_DEFAULT_ACTION implements IWriteFactory {
 	@Override
 	public  IWrite getWriteInstance(String caller,Action action){
 		if(StringUtils.isEmpty(caller)){
@@ -21,7 +21,7 @@ public class FactoryDEFAULTAction implements IWriteFactory {
 			return null;
 		}
 		
-		String name = "Pro_"+caller+"_"+action.raw().toUpperCase();
+		String name = "Pro_"+caller+"_"+action.forClassName();
 		String packages = "write.factory.product";
 		String implClass = packages+"."+caller+"."+name;
 		IWrite write = null;
@@ -39,7 +39,7 @@ public class FactoryDEFAULTAction implements IWriteFactory {
 		}
 		
 		//没有实现则使用默认实现处理		
-		implClass = packages+".defaults"+".Pro_default_"+action.raw().toUpperCase();;
+		implClass = packages+".defaults"+".Pro_default_"+action.forClassName();
 		try {
 			write = (IWrite)Jws.classloader.loadClass(implClass).newInstance();
 		} catch (InstantiationException e) {

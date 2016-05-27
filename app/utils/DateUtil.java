@@ -202,6 +202,7 @@ public class DateUtil {
 		return sdf.format(new Date());
 	}
 	
+ 	
 	/**
 	 * 获取某天凌晨的毫秒时间
 	 * @param time
@@ -474,6 +475,8 @@ public class DateUtil {
        }
        return false;
    }
+   
+   
    
    /**
     * 判断是否时，今天的时间戳

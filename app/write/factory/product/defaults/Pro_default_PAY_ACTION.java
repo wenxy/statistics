@@ -14,29 +14,32 @@ import jws.Logger;
 import utils.FileUtil;
 import utils.RedisUtil;
 
-public class Pro_default_PAY extends IReadWrite{
+public class Pro_default_PAY_ACTION extends IReadWrite{
 	@Override
 	public void write(JsonObject json) {
 		if(json==null || json.isJsonNull())return;
 		try{
 			
-			long uid=json.get("data").getAsJsonObject().get("uid").getAsLong();
-			double amount = json.get("data").getAsJsonObject().get("amount").getAsDouble();
-			
+			String caller =  json.get("caller").getAsString();
+			String action =  json.get("action").getAsString();
 			int gameId = json.get("game").getAsJsonObject().get("id").getAsInt();
 			String ch = json.get("game").getAsJsonObject().get("ch").getAsString();
 			String date = json.get("game").getAsJsonObject().get("date").getAsString();
 			
+			long uid=json.get("data").getAsJsonObject().get("uid").getAsLong();
+			double amount = json.get("data").getAsJsonObject().get("amount").getAsDouble();
+			
+ 			
 			//is new user?
-			String key = RedisUtil.apply(date, ch, gameId, String.valueOf(uid));
+			String key = RedisUtil.apply(date, ch, gameId, String.valueOf(uid),KPI.UIDREG_KPI.raw());
 			ValueRedisTemplate redis = ValueRedisTemplate.getInstance(MQInstance.BASE);
 			String value = redis.get(key);
 			boolean isNewUser = (!StringUtils.isEmpty(value) && value.equals("1"))?true:false;
 			
 			
-			String payKey = RedisUtil.apply(date, ch, gameId, KPI.PAYTOTAL.raw());
-			String newPayKey = RedisUtil.apply(date, ch, gameId, KPI.NEWPAYTOTAL.raw());
-			String oldPayKey = RedisUtil.apply(date, ch, gameId, KPI.OLDPAYTOTAL.raw());
+			String payKey = RedisUtil.apply(date, ch, gameId, KPI.PAYTOTAL_KPI.raw());
+			String newPayKey = RedisUtil.apply(date, ch, gameId, KPI.NEWPAYTOTAL_KPI.raw());
+			String oldPayKey = RedisUtil.apply(date, ch, gameId, KPI.OLDPAYTOTAL_KPI.raw());
 			
 			String payAmountStr = redis.get(payKey);
 			String newPayAmountStr = redis.get(newPayKey);
@@ -68,34 +71,34 @@ public class Pro_default_PAY extends IReadWrite{
 			}
 			
 			//store pay user
-			File storePayUser = getWriteStoreFile(json,KPI.PAYUSER.raw());
-			FileUtil.write(storePayUser, uid+",", true);
+			File storePayUser = getWriteStoreFile( caller, date, gameId, ch, action,KPI.PAYUSER_KPI.raw());
+			FileUtil.write(storePayUser, uid+NEW_LINE, true);
 			
 			//store pay total
 			payAmount += amount;
-			File storePayTotal = getWriteStoreFile(json,KPI.PAYTOTAL.raw());
+			File storePayTotal = getWriteStoreFile( caller, date, gameId, ch, action,KPI.PAYTOTAL_KPI.raw());
 			FileUtil.write(storePayTotal, String.valueOf(payAmount), false);
 			
 			redis.set(payKey, String.valueOf(payAmount));
 			
 			if(isNewUser){
 				//store new pay user
-				File storeNewPayUser = getWriteStoreFile(json,KPI.NEWPAYUSER.raw());
-				FileUtil.write(storeNewPayUser, uid+",", true);
+				File storeNewPayUser = getWriteStoreFile( caller, date, gameId, ch, action,KPI.NEWPAYUSER_KPI.raw());
+				FileUtil.write(storeNewPayUser, uid+NEW_LINE, true);
 				//store new pay total
 				newPayAmount+=amount;
-				File storeNewPayTotal = getWriteStoreFile(json,KPI.NEWPAYTOTAL.raw());
+				File storeNewPayTotal =getWriteStoreFile( caller, date, gameId, ch, action,KPI.NEWPAYTOTAL_KPI.raw());
 				FileUtil.write(storeNewPayTotal, String.valueOf(newPayAmount), false);
 				
 				redis.set(newPayKey, String.valueOf(newPayAmount));
 			}else{
 				//store old pay user
-				File storeOldPayUser = getWriteStoreFile(json,KPI.OLDPAYUSER.raw());
-				FileUtil.write(storeOldPayUser, uid+",", true);
+				File storeOldPayUser = getWriteStoreFile( caller, date, gameId, ch, action,KPI.OLDPAYUSER_KPI.raw());
+				FileUtil.write(storeOldPayUser, uid+NEW_LINE, true);
 				
 				//store old pay total
 				oldPayAmount+=amount;
-				File storeOldPayTotal = getWriteStoreFile(json,KPI.OLDPAYTOTAL.raw());
+				File storeOldPayTotal = getWriteStoreFile( caller, date, gameId, ch, action,KPI.OLDPAYTOTAL_KPI.raw());
 				FileUtil.write(storeOldPayTotal, String.valueOf(oldPayAmount), false);
 				
 				redis.set(oldPayKey, String.valueOf(oldPayAmount));
