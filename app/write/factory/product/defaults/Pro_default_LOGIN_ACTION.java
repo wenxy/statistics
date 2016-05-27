@@ -61,15 +61,15 @@ public class Pro_default_LOGIN_ACTION extends IReadWrite{
 				FileUtil.write(store, uid+NEW_LINE, true);
 			}
 			 
-			String newImeiLoginKey = RedisUtil.apply(date, ch, gameId, String.valueOf(uid),KPI.IMEIREG_KPI.raw());
+			String newImeiLoginKey = RedisUtil.apply(date, ch, gameId, String.valueOf(imei),KPI.IMEIREG_KPI.raw());
 			String newImeiLoginValue = redis.get(newImeiLoginKey);
 			boolean newImeiLogin = (!StringUtils.isEmpty(newImeiLoginValue) && newImeiLoginValue.equals("1"))?true:false;
 			if(newImeiLogin){
 				File store = getWriteStoreFile( caller, date, gameId, ch, action,KPI.NEWIMEILOGIN_KPI.raw());
-				FileUtil.write(store, uid+NEW_LINE, true);
+				FileUtil.write(store, imei+NEW_LINE, true);
 			}else{
 				File store = getWriteStoreFile( caller, date, gameId, ch, action,KPI.OLDIMEILOGIN_KPI.raw());
-				FileUtil.write(store, uid+NEW_LINE, true);
+				FileUtil.write(store, imei+NEW_LINE, true);
 			}
 		}catch(Exception e){
 			Logger.error(e, "ShunwanLogin.write exception %s",e.getMessage());
