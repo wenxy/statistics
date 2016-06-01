@@ -20,8 +20,8 @@ public class Pro_default_OLDIMEILOGIN_KPI extends IReadWrite{
 	public String read(String caller,String date, int gameId, String ch) {
 		try{
 
-			String skeyLogin = RedisUtil.apply(date, ch, gameId, KPI.OLDIMEILOGIN_KPI.raw());
-			String ckeyLogin = RedisUtil.apply(date, ch, gameId, Action.LOGIN_ACTION.raw(),KPI.OLDIMEILOGIN_KPI.raw());//计算key caculateKey
+			String skeyLogin = RedisUtil.apply(caller,date, ch, gameId, KPI.OLDIMEILOGIN_KPI.raw());
+			String ckeyLogin = RedisUtil.apply(caller,date, ch, gameId, Action.LOGIN_ACTION.raw(),KPI.OLDIMEILOGIN_KPI.raw());//计算key caculateKey
   			long oldLogincount = 0;
 			String loginRedisResult = readFromRedis(skeyLogin);
 			if(!StringUtils.isEmpty(loginRedisResult) && !isToday(date)){//查询当天的话，不走缓存，因为数据在实时变化ing

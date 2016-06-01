@@ -24,7 +24,7 @@ public class Pro_default_ARPU_KPI extends IReadWrite{
 		try{
 			
 			double payTotal = 0.0;
-			String payTotal_skey = RedisUtil.apply(date, ch, gameId, KPI.PAYTOTAL_KPI.raw());
+			String payTotal_skey = RedisUtil.apply(caller,date, ch, gameId, KPI.PAYTOTAL_KPI.raw());
 			String payTotalredisResult = readFromRedis(payTotal_skey);
 			if(!StringUtils.isEmpty(payTotalredisResult) && !isToday(date)){//查询当天的话，不走缓存，因为数据在实时变化ing
 				payTotal = Double.parseDouble(payTotalredisResult);
@@ -42,8 +42,8 @@ public class Pro_default_ARPU_KPI extends IReadWrite{
 			}
 			
 			//登錄用戶數
-			String uidLoginskey = RedisUtil.apply(date, ch, gameId, KPI.UIDLOGIN_KPI.raw());
-			String uidLoginckey = RedisUtil.apply(date, ch, gameId, Action.LOGIN_ACTION.raw(),KPI.UIDLOGIN_KPI.raw());//计算key caculateKey
+			String uidLoginskey = RedisUtil.apply(caller,date, ch, gameId, KPI.UIDLOGIN_KPI.raw());
+			String uidLoginckey = RedisUtil.apply(caller,date, ch, gameId, Action.LOGIN_ACTION.raw(),KPI.UIDLOGIN_KPI.raw());//计算key caculateKey
 			long loginCount = 0;
 			String loginRedisResult = readFromRedis(uidLoginskey);
 			if(!StringUtils.isEmpty(loginRedisResult) && !isToday(date)){//查询当天的话，不走缓存，因为数据在实时变化ing

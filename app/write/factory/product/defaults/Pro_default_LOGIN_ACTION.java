@@ -30,7 +30,7 @@ public class Pro_default_LOGIN_ACTION extends IReadWrite{
 			
 			//避免一天的数据重复写入
 			ValueRedisTemplate redis = ValueRedisTemplate.getInstance(MQInstance.BASE);
-			String imeikey = RedisUtil.apply(date, ch, gameId,imei,KPI.IMEILOGIN_KPI.raw());
+			String imeikey = RedisUtil.apply(caller,date, ch, gameId,imei,KPI.IMEILOGIN_KPI.raw());
 			String imeivalue = redis.get(imeikey);
 			boolean isImeiExist = (!StringUtils.isEmpty(imeivalue) && imeivalue.equals("1"))?true:false;
 			
@@ -40,7 +40,7 @@ public class Pro_default_LOGIN_ACTION extends IReadWrite{
 				redis.setAtExpire(imeikey, "1", RedisUtil.unixTimeSince(date, 1));//一天后失效
 			}
 			
-			String uidkey = RedisUtil.apply(date, ch, gameId,String.valueOf(uid),KPI.UIDLOGIN_KPI.raw());
+			String uidkey = RedisUtil.apply(caller,date, ch, gameId,String.valueOf(uid),KPI.UIDLOGIN_KPI.raw());
 			String uidvalue = redis.get(uidkey);
 			boolean isUidExist = (!StringUtils.isEmpty(uidvalue) && uidvalue.equals("1"))?true:false;
 			
@@ -50,7 +50,7 @@ public class Pro_default_LOGIN_ACTION extends IReadWrite{
 				redis.setAtExpire(uidkey, "1", RedisUtil.unixTimeSince(date, 1));//一天后失效
 			}
 			
-			String newUidLoginKey = RedisUtil.apply(date, ch, gameId, String.valueOf(uid),KPI.UIDREG_KPI.raw());
+			String newUidLoginKey = RedisUtil.apply(caller,date, ch, gameId, String.valueOf(uid),KPI.UIDREG_KPI.raw());
 			String newUidLoginValue = redis.get(newUidLoginKey);
 			boolean newUidLogin = (!StringUtils.isEmpty(newUidLoginValue) && newUidLoginValue.equals("1"))?true:false;
 			if(newUidLogin){
@@ -61,7 +61,7 @@ public class Pro_default_LOGIN_ACTION extends IReadWrite{
 				FileUtil.write(store, uid+NEW_LINE, true);
 			}
 			 
-			String newImeiLoginKey = RedisUtil.apply(date, ch, gameId, String.valueOf(imei),KPI.IMEIREG_KPI.raw());
+			String newImeiLoginKey = RedisUtil.apply(caller,date, ch, gameId, String.valueOf(imei),KPI.IMEIREG_KPI.raw());
 			String newImeiLoginValue = redis.get(newImeiLoginKey);
 			boolean newImeiLogin = (!StringUtils.isEmpty(newImeiLoginValue) && newImeiLoginValue.equals("1"))?true:false;
 			if(newImeiLogin){

@@ -14,7 +14,7 @@ public class Pro_default_OLDPAYTOTAL_KPI extends IReadWrite{
 	@Override
 	public String read(String caller,String date, int gameId, String ch) {
 		try{
-			String skey = RedisUtil.apply(date, ch, gameId, KPI.OLDPAYTOTAL_KPI.raw());
+			String skey = RedisUtil.apply(caller,date, ch, gameId, KPI.OLDPAYTOTAL_KPI.raw());
  
 			String redisResult = readFromRedis(skey);
 			if(!StringUtils.isEmpty(redisResult) && !isToday(date)){//查询当天的话，不走缓存，因为数据在实时变化ing

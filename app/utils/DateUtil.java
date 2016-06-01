@@ -745,6 +745,12 @@ public class DateUtil {
        return sdf.format(new Date(ts));
    }
    
+   public static String formatDate2(long ts)
+   {
+       SimpleDateFormat sdf = new SimpleDateFormat(ONLY_DATE_FORMAT);
+       return sdf.format(new Date(ts));
+   }
+   
    /**
 	 * 获取当前时间
 	 * @return

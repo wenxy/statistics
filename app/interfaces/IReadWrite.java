@@ -18,6 +18,8 @@ import com.google.gson.JsonObject;
 
 import common.redis.template.SetRedisTemplate;
 import common.redis.template.ValueRedisTemplate;
+import constants.Action;
+import constants.KPI;
 import constants.MQInstance;
 import jws.Jws;
 import jws.Logger;
@@ -46,13 +48,27 @@ public abstract class IReadWrite implements IWrite,IRead{
 	 * @return
 	 * @throws Exception 
 	 */
-	protected File getWriteStoreFile(String caller,String date,int gameId,String ch,String action,String suffix) throws Exception{
+	protected File getWriteStoreFile(String caller,String date,int gameId,String ch,String action,String... suffix) throws Exception{
 		String home = Jws.configuration.getProperty("stat.store", null);
 		if(StringUtils.isEmpty(home)){
 			throw new Exception("IReadWrite.getStoreFile exception,you must config the stat.store path.");
 		}
 		
-		String fname = date+"_"+gameId+"_"+ch+"."+suffix;
+		if(suffix.length==0){
+			return null;
+		}
+		String fname = date+"_"+gameId+"_"+ch+".";
+		if(suffix.length == 1){
+			fname = fname+suffix;
+		}else{
+			for(int i=0;i<suffix.length;i++){
+				if(i == suffix.length - 1){
+					fname = fname + suffix[i];
+				}else{
+					fname = fname + suffix[i]+"_";
+				}
+			}
+		}		
 		// home/caller/action/year/gameId/ch/
 		String filePath = home+File.separator+caller+File.separator+action+File.separator+DateUtil.getYear(date)+File.separator+gameId+File.separator+ch+File.separator;
 		
@@ -280,5 +296,66 @@ public abstract class IReadWrite implements IWrite,IRead{
 		}
 		return false;
 	}
+	
+	
+	/**
+	 * 获取某天的注册数-UID
+	 * @param caller
+	 * @param date
+	 * @param gameId
+	 * @param ch
+	 * @return
+	 */
+	protected long regNumForDateByUID(String caller,String date, int gameId, String ch){
+		try{
+			String skey = RedisUtil.apply(caller,date, ch, gameId, KPI.UIDREG_KPI.raw());
+			String ckey = RedisUtil.apply(caller,date, ch, gameId, Action.REG_ACTION.raw(),KPI.UIDREG_KPI.raw());//计算key caculateKey
+
+			String redisResult = readFromRedis(skey);
+			if(!StringUtils.isEmpty(redisResult) && !isToday(date)){//查询当天的话，不走缓存，因为数据在实时变化ing
+				return Long.parseLong(redisResult);
+			}
+			
+			File file = getReadStoreFile(caller,date,gameId,ch,Action.REG_ACTION.raw(),KPI.UIDREG_KPI.raw());
+			//计算数 
+			long count = caculateSingleSize(file,ckey,MQInstance.BASE);
+			writeToRedis(skey,String.valueOf(count),KPI_CACHE_SEC);
+			
+			return count;
+		}catch(Exception e){
+			Logger.error(e, "0");
+		}
+		return 0;
+	}
+	/**
+	 * 获取某天的注册数-IMEI
+	 * @param caller
+	 * @param date
+	 * @param gameId
+	 * @param ch
+	 * @return
+	 */
+	public String regNumForDateByIMEI(String caller,String date, int gameId, String ch) {
+		try{
+			String skey = RedisUtil.apply(caller,date, ch, gameId, KPI.IMEIREG_KPI.raw());
+			String ckey = RedisUtil.apply(caller,date, ch, gameId, Action.REG_ACTION.raw(),KPI.IMEIREG_KPI.raw());//计算key caculateKey
+
+			String redisResult = readFromRedis(skey);
+			if(!StringUtils.isEmpty(redisResult) && !isToday(date)){//查询当天的话，不走缓存，因为数据在实时变化ing
+				return redisResult;
+			}
+			File file = getReadStoreFile(caller,date,gameId,ch,Action.REG_ACTION.raw(),KPI.IMEIREG_KPI.raw());
+
+			//计算数 
+			long count = caculateSingleSize(file,ckey,MQInstance.BASE);
+			writeToRedis(skey,String.valueOf(count),KPI_CACHE_SEC);
+			
+			return String.valueOf(count);
+		}catch(Exception e){
+			Logger.error(e, "0");
+		}
+		return "";
+	}
+	
 	
 }

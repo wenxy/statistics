@@ -18,8 +18,8 @@ public class Pro_default_OLDPAYRATE_KPI extends IReadWrite{
 			
 			//查旧用户付费数
 			long oldpaycount = 0;
-			String oldpayuser_skey = RedisUtil.apply(date, ch, gameId, KPI.OLDPAYUSER_KPI.raw());
-			String oldpayUser_ckey = RedisUtil.apply(date, ch, gameId, Action.PAY_ACTION.raw(),KPI.OLDPAYUSER_KPI.raw());//计算key caculateKey
+			String oldpayuser_skey = RedisUtil.apply(caller,date, ch, gameId, KPI.OLDPAYUSER_KPI.raw());
+			String oldpayUser_ckey = RedisUtil.apply(caller,date, ch, gameId, Action.PAY_ACTION.raw(),KPI.OLDPAYUSER_KPI.raw());//计算key caculateKey
 
 			String oldpayUseredisResult = readFromRedis(oldpayuser_skey);
 			if(!StringUtils.isEmpty(oldpayUseredisResult) && !isToday(date)){//查询当天的话，不走缓存，因为数据在实时变化ing
@@ -39,8 +39,8 @@ public class Pro_default_OLDPAYRATE_KPI extends IReadWrite{
 			
 			
 			//计算旧活跃用户数
-			String skeyLogin = RedisUtil.apply(date, ch, gameId, KPI.OLDUIDLOGIN_KPI.raw());
-			String ckeyLogin = RedisUtil.apply(date, ch, gameId, Action.LOGIN_ACTION.raw(),KPI.OLDUIDLOGIN_KPI.raw());//计算key caculateKey
+			String skeyLogin = RedisUtil.apply(caller,date, ch, gameId, KPI.OLDUIDLOGIN_KPI.raw());
+			String ckeyLogin = RedisUtil.apply(caller,date, ch, gameId, Action.LOGIN_ACTION.raw(),KPI.OLDUIDLOGIN_KPI.raw());//计算key caculateKey
   			long oldLogincount = 0;
 			String loginRedisResult = readFromRedis(skeyLogin);
 			if(!StringUtils.isEmpty(loginRedisResult) && !isToday(date)){//查询当天的话，不走缓存，因为数据在实时变化ing
@@ -59,7 +59,7 @@ public class Pro_default_OLDPAYRATE_KPI extends IReadWrite{
 			}
 			
 			 
-			return String.valueOf(oldpaycount/oldLogincount);
+			return String.valueOf((double)oldpaycount/oldLogincount);
 		}catch(Exception e){
 			Logger.error(e, "0");
 		}

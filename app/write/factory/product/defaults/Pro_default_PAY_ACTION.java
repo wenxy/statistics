@@ -31,15 +31,16 @@ public class Pro_default_PAY_ACTION extends IReadWrite{
 			
  			
 			//is new user?
-			String key = RedisUtil.apply(date, ch, gameId, String.valueOf(uid),KPI.UIDREG_KPI.raw());
+			String key = RedisUtil.apply(caller,date, ch, gameId, String.valueOf(uid),KPI.UIDREG_KPI.raw());
 			ValueRedisTemplate redis = ValueRedisTemplate.getInstance(MQInstance.BASE);
 			String value = redis.get(key);
-			boolean isNewUser = (!StringUtils.isEmpty(value) && value.equals("1"))?true:false;
+			boolean isNewUser = (!StringUtils.isEmpty(value) && value.equals(date))?true:false;
 			
 			
-			String payKey = RedisUtil.apply(date, ch, gameId, KPI.PAYTOTAL_KPI.raw());
-			String newPayKey = RedisUtil.apply(date, ch, gameId, KPI.NEWPAYTOTAL_KPI.raw());
-			String oldPayKey = RedisUtil.apply(date, ch, gameId, KPI.OLDPAYTOTAL_KPI.raw());
+			String payKey = RedisUtil.apply(caller,date, ch, gameId, KPI.PAYTOTAL_KPI.raw());
+			String newPayKey = RedisUtil.apply(caller,date, ch, gameId, KPI.NEWPAYTOTAL_KPI.raw());
+			String oldPayKey = RedisUtil.apply(caller,date, ch, gameId, KPI.OLDPAYTOTAL_KPI.raw());
+			
 			
 			String payAmountStr = redis.get(payKey);
 			String newPayAmountStr = redis.get(newPayKey);
@@ -102,6 +103,27 @@ public class Pro_default_PAY_ACTION extends IReadWrite{
 				FileUtil.write(storeOldPayTotal, String.valueOf(oldPayAmount), false);
 				
 				redis.set(oldPayKey, String.valueOf(oldPayAmount));
+			}
+			
+			//写ltv需要的统计数据 某个时间点注册的用户再在某个充值日期总计充值多少元
+ 			String uidkey = RedisUtil.apply(caller,date, ch, gameId, String.valueOf(uid),KPI.UIDREG_KPI.raw());
+			String regDate = redis.get(uidkey);
+			if(!StringUtils.isEmpty(regDate)){
+				String ltvPayKey = RedisUtil.apply(caller,date, ch, gameId, KPI.LTV_KPI.raw(),regDate);
+				double ltvPayAmount=0;
+				try{
+					ltvPayAmount = Double.parseDouble(redis.get(ltvPayKey));
+				}catch(Exception e){
+					ltvPayAmount = 0;
+				}
+				ltvPayAmount += amount;
+				
+				//store ltvPay Amount
+				 
+				File ltvPayFile = getWriteStoreFile( caller, date, gameId, ch, action,KPI.LTV_KPI.raw(),regDate);
+				FileUtil.write(ltvPayFile, String.valueOf(ltvPayAmount), false);
+				
+				redis.set(ltvPayKey, String.valueOf(ltvPayAmount));
 			}
 		}catch(Exception e){
 			Logger.error(e, "ShunwanPay.write exception %s",e.getMessage());

@@ -31,7 +31,7 @@ public class Pro_default_ACT_ACTION extends IReadWrite{
 			
 			//避免一天的数据重复写入
 			ValueRedisTemplate redis = ValueRedisTemplate.getInstance(MQInstance.BASE);
-			String key = RedisUtil.apply(date, ch, gameId,content,KPI.ACT_KPI.raw());
+			String key = RedisUtil.apply(caller,date, ch, gameId,content,KPI.ACT_KPI.raw());
 			String value = redis.get(key);
 			boolean isExist = (!StringUtils.isEmpty(value) && value.equals("1"))?true:false;
 			
