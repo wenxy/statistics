@@ -71,12 +71,7 @@ public class KpiQuery extends Controller {
 				renderJSON(new Gson().toJson(response));
 			}
 
-			if (!requestBody.has("id") || requestBody.get("id").isJsonNull()) {
-				KPIResponse response = new KPIResponse();
-				response.getState().setCode(-1);
-				response.getState().setMsg("无效的参数-id.");
-				renderJSON(new Gson().toJson(response));
-			}
+			 
 
 			if (!requestBody.has("id") || requestBody.get("id").isJsonNull()) {
 				KPIResponse response = new KPIResponse();

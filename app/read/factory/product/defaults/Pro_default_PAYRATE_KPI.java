@@ -9,6 +9,7 @@ import constants.KPI;
 import constants.MQInstance;
 import interfaces.IReadWrite;
 import jws.Logger;
+import utils.NumberUtil;
 import utils.RedisUtil;
 
 public class Pro_default_PAYRATE_KPI extends IReadWrite{
@@ -50,7 +51,7 @@ public class Pro_default_PAYRATE_KPI extends IReadWrite{
 				writeToRedis(skey,String.valueOf(payCount),KPI_CACHE_SEC);
 			}
 			
-			return String.valueOf((double)payCount/loginCount);
+			return String.valueOf(NumberUtil.formatP((double)payCount/loginCount));
 		}catch(Exception e){
 			Logger.error(e, "");
 		}

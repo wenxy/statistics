@@ -10,6 +10,7 @@ import constants.MQInstance;
 import interfaces.IReadWrite;
 import jws.Logger;
 import utils.DateUtil;
+import utils.NumberUtil;
 import utils.RedisUtil;
 /**
  * 计算1-7 15 20 30 日留存(UID)
@@ -164,10 +165,11 @@ public class Pro_default_UIDKEEPRATE_KPI extends IReadWrite{
 			
 			StringBuffer sb = new StringBuffer();
 			for(int i=0;i<result.length;i++){
+				String p = NumberUtil.formatP(Double.parseDouble(result[i]));
 				if(i == result.length-1){
-					sb.append(result[i]);
+					sb.append(p);
 				}else{
-					sb.append(result[i]).append(",");
+					sb.append(p).append(",");
 				}
 			}
 			

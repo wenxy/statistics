@@ -43,6 +43,6 @@ public class Pro_default_OLDUIDLOGIN_KPI extends IReadWrite{
 		}catch(Exception e){
 			Logger.error(e, "0");
 		}
-		return "";
+		return "0";
 	}
 }

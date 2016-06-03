@@ -10,6 +10,7 @@ import constants.MQInstance;
 import interfaces.IReadWrite;
 import jws.Logger;
 import utils.DateUtil;
+import utils.NumberUtil;
 import utils.RedisUtil;
 /**
  * 计算1-7 15 20 30 日留存(IMEI)
@@ -33,7 +34,6 @@ public class Pro_default_IMEIKEEPRATE_KPI extends IReadWrite{
 			String date_15 = DateUtil.formatDate2(DateUtil.addDay(time, 15));
 			String date_20 = DateUtil.formatDate2(DateUtil.addDay(time, 20));
 			String date_30 = DateUtil.formatDate2(DateUtil.addDay(time, 30));
-			
 			 
 			//注册数
 			long regCount = 0;
@@ -109,8 +109,7 @@ public class Pro_default_IMEIKEEPRATE_KPI extends IReadWrite{
 				result[4] = redisResult;
 			}else{
 				result[4] = String.valueOf(caculate(regFile,dateFile,cKeyReg,cKeyDate,regCount));
-			}	
-			
+			}
 			
 			//6日留存
 			dateFile = getReadStoreFile(caller,date_6,gameId,ch,Action.LOGIN_ACTION.raw(),KPI.IMEILOGIN_KPI.raw());
@@ -176,10 +175,11 @@ public class Pro_default_IMEIKEEPRATE_KPI extends IReadWrite{
 			
 			StringBuffer sb = new StringBuffer();
 			for(int i=0;i<result.length;i++){
+				String p = NumberUtil.formatP(Double.parseDouble(result[i]));
 				if(i == result.length-1){
-					sb.append(result[i]);
+					sb.append(p);
 				}else{
-					sb.append(result[i]).append(",");
+					sb.append(p).append(",");
 				}
 			}
 			

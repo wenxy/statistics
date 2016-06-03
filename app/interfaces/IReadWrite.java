@@ -54,12 +54,12 @@ public abstract class IReadWrite implements IWrite,IRead{
 			throw new Exception("IReadWrite.getStoreFile exception,you must config the stat.store path.");
 		}
 		
-		if(suffix.length==0){
+		if(suffix == null || suffix.length==0){
 			return null;
 		}
 		String fname = date+"_"+gameId+"_"+ch+".";
 		if(suffix.length == 1){
-			fname = fname+suffix;
+			fname = fname+suffix[0];
 		}else{
 			for(int i=0;i<suffix.length;i++){
 				if(i == suffix.length - 1){
@@ -311,14 +311,23 @@ public abstract class IReadWrite implements IWrite,IRead{
 			String skey = RedisUtil.apply(caller,date, ch, gameId, KPI.UIDREG_KPI.raw());
 			String ckey = RedisUtil.apply(caller,date, ch, gameId, Action.REG_ACTION.raw(),KPI.UIDREG_KPI.raw());//计算key caculateKey
 
-			String redisResult = readFromRedis(skey);
-			if(!StringUtils.isEmpty(redisResult) && !isToday(date)){//查询当天的话，不走缓存，因为数据在实时变化ing
-				return Long.parseLong(redisResult);
+			
+			long count = 0;
+			try{
+				String redisResult = readFromRedis(skey);
+				count = Long.parseLong(redisResult);
+			}catch(NumberFormatException e){
+				
+			}
+			
+			
+			if(count >0  && !isToday(date)){//查询当天的话，不走缓存，因为数据在实时变化ing
+				return count;
 			}
 			
 			File file = getReadStoreFile(caller,date,gameId,ch,Action.REG_ACTION.raw(),KPI.UIDREG_KPI.raw());
 			//计算数 
-			long count = caculateSingleSize(file,ckey,MQInstance.BASE);
+			count = caculateSingleSize(file,ckey,MQInstance.BASE);
 			writeToRedis(skey,String.valueOf(count),KPI_CACHE_SEC);
 			
 			return count;
@@ -340,14 +349,21 @@ public abstract class IReadWrite implements IWrite,IRead{
 			String skey = RedisUtil.apply(caller,date, ch, gameId, KPI.IMEIREG_KPI.raw());
 			String ckey = RedisUtil.apply(caller,date, ch, gameId, Action.REG_ACTION.raw(),KPI.IMEIREG_KPI.raw());//计算key caculateKey
 
-			String redisResult = readFromRedis(skey);
-			if(!StringUtils.isEmpty(redisResult) && !isToday(date)){//查询当天的话，不走缓存，因为数据在实时变化ing
-				return redisResult;
+			long count = 0;
+			try{
+				String redisResult = readFromRedis(skey);
+				count = Long.parseLong(redisResult);
+			}catch(NumberFormatException e){
+				
+			}
+			 
+			if(count>0 && !isToday(date)){//查询当天的话，不走缓存，因为数据在实时变化ing
+				return String.valueOf(count);
 			}
 			File file = getReadStoreFile(caller,date,gameId,ch,Action.REG_ACTION.raw(),KPI.IMEIREG_KPI.raw());
 
 			//计算数 
-			long count = caculateSingleSize(file,ckey,MQInstance.BASE);
+			count = caculateSingleSize(file,ckey,MQInstance.BASE);
 			writeToRedis(skey,String.valueOf(count),KPI_CACHE_SEC);
 			
 			return String.valueOf(count);

@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport" />
+    <title>KPI查询</title>
+    <link rel="stylesheet" href="/public/css/layout.css">
+    <link rel="stylesheet" href="/public/css/beautify.css">
+    <link rel="stylesheet"  href="/public/css/jquery.datetimepicker.css" />
+    <script src="/public/js/jquery-1.11.3.min.js"></script>
+    <script src="/public/js/layout.js"></script>
+    <script src="/public/js/template.js"></script>
+    <script type="text/javascript" src="/public/js/jquery.datetimepicker.js"></script>
+     <script type="text/javascript" src="/public/js/Chart.bundle.js"></script>
+    <style>
+        .nav-selected{
+            background: url("/public/images/nva_selected.png") no-repeat;
+            width: 187px;
+            height: 44px;
+            line-height: 44px;
+        }
+        input{
+            background: #eaeaea;
+            height: 30px;
+        }
+         canvas{
+        -moz-user-select: none;
+        -webkit-user-select: none;
+        -ms-user-select: none;
+    }
+    </style>
+</head>
+<body>
+</br>
+<form id="searchForm" action="@{Query.query}" method="post">
+游戏ID:<input type="text" id="gameId" name="gameId" value="${gameId}"  placeholder="请输入游戏ID号" style="background: #eaeaea;"/>
+渠道标识:<input type="text" id="ch" name="ch" value="${ch}"  placeholder="请输入渠道标识" style="background: #eaeaea;"/>
+日期:<input type="text" id="startTimePick" name="date" value="${date}" />
+caller:<input type="text" id="caller" name="caller" value="${caller}"  placeholder="请输入caller号" style="background: #eaeaea;"/>
+appKey:<input type="text" id="appKey" name="appKey" value="${appKey}"  placeholder="请输入appKey号" style="background: #eaeaea;"/>
+<a id="search"  href="javascript:void(0);" class="f-btn-search" >查 询</a>#{if response}
+<span style="color:red;">${response?.state.msg}</span>
+#{/if}
+</form>
+	#{if kpiMap!=null}
+	</br>
+	
+	<span style="color:blue;">KPI查询结果：</span></br></br>
+	
+	<div class="" style="margin-top: 5px;height:30px;">
+       <div class="f-ly-column" style="height: 30px;">
+           <div col="100px">
+               激活数:<span style="color:blue;">${kpiMap?.get("ACT_KPI")}</span>
+           </div> 
+    </div>
+	
+	<div class="" style="margin-top: 5px;height:50px;">
+       <div class="f-ly-column" style="height: 20px;background-color: #666;color:#fff;" >
+           <div col="110px">
+               注册数(UID)
+           </div>
+           <div col="110px">
+               登录数(UID)
+           </div>
+            <div col="110px">
+               新用户登录数(UID)
+           </div>
+           <div col="110px">
+               老用户登录数(UID)
+           </div> 
+    	</div>
+    	<div class="f-ly-column" style="height: 20px;">
+           <div col="110px">
+               <span style="color:blue;">${kpiMap?.get("UIDREG_KPI")}</span>
+           </div>
+           <div col="110px">
+               <span style="color:blue;">${kpiMap?.get("UIDLOGIN_KPI")}</span>
+           </div>
+            <div col="110px">
+               <span style="color:blue;">${kpiMap?.get("NEWUIDLOGIN_KPI")}</span>
+           </div>
+           <div col="110px">
+               <span style="color:blue;">${kpiMap?.get("OLDUIDLOGIN_KPI")}</span>
+           </div>
+            
+    	</div>
+    	
+    </div>
+    
+    
+    <div class="" style="margin-top: 5px;height:50px;">
+       <div class="f-ly-column" style="height: 20px;background-color: #777;color:#fff;">
+           <div col="110px">
+               注册数(IMEI)
+           </div>
+           <div col="110px">
+               登录数(IMEI)
+           </div>
+            <div col="110px">
+               新用户登录数(IMEI)
+           </div>
+           <div col="110px">
+               老用户登录数(IMEI)
+           </div>
+         
+    	</div>
+    	
+    	<div class="f-ly-column" style="height: 20px;">
+           <div col="70px">
+               <span style="color:blue;">${kpiMap?.get("IMEIREG_KPI")}</span>
+           </div>
+           <div col="70px">
+               <span style="color:blue;">${kpiMap?.get("IMEILOGIN_KPI")}</span>
+           </div>
+            <div col="110px">
+               <span style="color:blue;">${kpiMap?.get("NEWIMEILOGIN_KPI")}</span>
+           </div>
+           <div col="110px">
+               <span style="color:blue;">${kpiMap?.get("OLDIMEILOGIN_KPI")}</span>
+           </div>
+    	</div>
+    </div>
+    
+    <div class="" style="margin-top: 5px;height:50px;">
+       <div class="f-ly-column" style="height: 20px;background-color: #888;color:#fff;">
+           <div col="100px">
+               收入
+           </div>
+           <div col="80px">
+               新用户收入
+           </div>
+            <div col="80px">
+               老用户收入
+           </div>
+              <div col="100px">
+               付费用户数
+           </div>
+            <div col="100px">
+              付费率
+           </div>
+            <div col="100px">
+               老付费用户数
+           </div>
+           <div col="100px">
+             老用户付费率
+           </div>
+            <div col="100px">
+               新付费用户数
+           </div> 
+            <div col="100px">
+               新用户付费率
+           </div>
+           <div col="130px">
+               平均每用户收入ARPU
+           </div>
+            <div col="160px">
+               平均每付费用户收入ARPPU
+           </div> 
+    	</div>
+    	
+    	<div class="f-ly-column" style="height: 20px;">
+           <div col="100px">
+               <span style="color:blue;">${kpiMap?.get("PAYTOTAL_KPI")}</span>
+           </div>
+           <div col="80px">
+               <span style="color:blue;">${kpiMap?.get("NEWPAYTOTAL_KPI")}</span>
+           </div>
+            <div col="80px">
+              <span style="color:blue;">${kpiMap?.get("OLDPAYTOTAL_KPI")}</span>
+           </div>
+              <div col="100px">
+               <span style="color:blue;">${kpiMap?.get("PAYUSER_KPI")}</span>
+           </div>
+            <div col="100px">
+              <span style="color:blue;">${kpiMap?.get("PAYRATE_KPI")}
+           </div>
+            <div col="100px">
+               <span style="color:blue;">${kpiMap?.get("OLDPAYUSER_KPI")}</span>
+           </div>
+           <div col="100px">
+           <span style="color:blue;">${kpiMap?.get("OLDPAYRATE_KPI")}</span>
+           </div>
+            <div col="100px">
+               <span style="color:blue;">${kpiMap?.get("NEWPAYUSER_KPI")}</span>
+           </div> 
+            <div col="100px">
+             <span style="color:blue;">${kpiMap?.get("NEWPAYRATE_KPI")}</span>
+           </div>
+           <div col="130px">
+               <span style="color:blue;">${kpiMap?.get("ARPU_KPI")}</span>
+           </div>
+            <div col="160px">
+               <span style="color:blue;">${kpiMap?.get("ARPPU_KPI")}</span>
+           </div> 
+    	</div>
+    </div>
+    
+    <div class="" style="margin-top: 5px;height:40px;">
+       <div class="f-ly-column" style="height: 20px;background-color: #999;color:#fff;">
+           <div col="300px">
+               用户留存率(UID)
+           </div>
+           <div col="300px">
+               用户留存率(IMEI)
+           </div>
+            <div col="300px">
+               用户价值
+           </div> 
+             <div col="500px" style="color:yellow;">
+               	备注：分别为1日，2日，3日，4日，5日，6日，7日，15日，20日，30日
+    		 </div>
+    	
+    	<div class="f-ly-column" style="height: 20px;">
+           <div col="300px">
+          <span style="color:blue;">${kpiMap?.get("UIDKEEPRATE_KPI")}
+           </div>
+           <div col="300px">
+               <span style="color:blue;">${kpiMap?.get("IMEIKEEPRATE_KPI")}</span>
+           </div>
+            <div col="300px">
+              <span style="color:blue;">${kpiMap?.get("LTV_KPI")}</span>
+           </div> 
+    	</div>
+    </div> 
+	#{/if}
+	</br></br>
+	<div class="" style="margin-top: 20px;height:20px;">
+       <div class="f-ly-column" style="height: 20px;">
+       	<div col="300px">
+               	<a id="actLineChart" onclick="lineType(0);" href="javascript:void(0);" class="f-btn-search" style="width:150px; background-color: #444;">用户激活趋势图</a>
+           </div>
+           <div col="300px">
+               	<a id="uidLineChart"  onclick="lineType(1);" href="javascript:void(0);" class="f-btn-search" style="width:150px; background-color: #555;">用户趋势图UID</a>
+           </div>
+           <div col="300px">
+              	<a id="imeiLineChart" onclick="lineType(2);" href="javascript:void(0);" class="f-btn-search" style="width:150px; background-color: #666;" >用户趋势图IMEI</a>
+           </div>
+            <div col="300px">
+               <a id="payLineChart"  onclick="lineType(3);" href="javascript:void(0);" class="f-btn-search" style="width:150px; background-color: #777;">付费趋势图</a>
+           </div> 
+           
+           <div col="300px">
+               <a id="addDayData"  href="javascript:void(0);" class="f-btn-search" style="width:150px;background-color: #567;"">加入一天数据</a>
+           </div>  
+            
+    </div> 
+    
+    <canvas id="canvas" height="80"></canvas>
+	
+<script>
+   var maxW = -1;
+   var h = $(document).height();
+   $(".left-nav").height(h);
+
+	
+	var gameId = $("#gameId").val();
+    var ch = $("#ch").val();
+    var date = $("#startTimePick").val();
+    var caller = $("#caller").val();
+    var appKey = $("#appKey").val();
+    var type=$("#type").val();
+
+    $("#searchCharge").click(function(){
+    	$("#searchForm").submit();
+    });
+    
+    
+    var addNewValue = function(label,value){
+    	$.each(config.data.datasets, function(i, dataset) {
+        	console.log(dataset.label,label);
+        	if(dataset.label == label){
+        		dataset.data.push(value);
+        	}
+        });
+    }
+    
+    function lineType(xtype){
+    	$.ajax({
+            url:"@{Query.ajaxQuery}",
+            dataType:"json", //返回的数据类型,text 或者 json数据，建议为json
+            type:"post", //传参方式，get 或post
+            data:{gameId:gameId,ch:ch,date:date,caller:caller,appKey:appKey,type:xtype},
+            error: function(msg){   
+            	console.log(msg);
+            },
+            success: function(result) {
+              config.data.labels=[];
+              config.data.datasets=[];
+              type = xtype;
+              if (config.data.datasets.length >= 0) {
+                config.data.labels.push(result.date);
+               
+                $.each(result.data, function(i, data) {
+                	var borderColor = randomColor(0.4);
+                	var backgroundColor = randomColor(0.5);
+                    config.data.datasets.push({label:data.label,data:[data.value],fill:true,
+                    borderColor: borderColor,
+	                backgroundColor: backgroundColor,
+	                pointBorderColor: borderColor,
+	                pointBackgroundColor: backgroundColor,
+	                pointBorderWidth: 1
+                    });
+                });
+                
+                setMaxY();
+                 
+				//config.options.scales.yAxes[0].ticks.suggestedMax =10;
+                window.myLine.update();
+            	}
+            }
+	    });
+    }
+    
+    $("#addDayData").click(function(){
+    	var maxDate = config.data.labels[config.data.labels.length-1]
+    	$.ajax({
+            url:"@{Query.ajaxQuery}",
+            dataType:"json", //返回的数据类型,text 或者 json数据，建议为json
+            type:"post", //传参方式，get 或post
+            data:{gameId:gameId,ch:ch,date:maxDate,caller:caller,appKey:appKey,type:type,add:1},
+            error: function(msg){   
+            	console.log(msg);
+            },
+            success: function(result) { 
+              if (config.data.datasets.length >= 0) {
+                config.data.labels.push(result.date); 
+                $.each(result.data, function(i, data) {
+               		addNewValue(data.label,data.value);
+                });
+                
+                setMaxY();
+				//config.options.scales.yAxes[0].ticks.suggestedMax =10;
+                window.myLine.update();
+            	}
+            }
+	    });
+    });
+    
+    //日期选择控件
+    $('#startTimePick').datetimepicker();
+    $('#startTimePick').datetimepicker({
+
+        lang:'ch',
+        format:'Y-m-d',
+        formatDate:'Y-m-d',
+        timepicker:false
+    });
+
+    $('#endTimePick').datetimepicker();
+    $('#endTimePick').datetimepicker({
+
+        lang:'ch',
+        format:'Y-m-d',
+        formatDate:'Y-m-d',
+        timepicker:false
+    });
+    
+    $("#search").click(function(){
+    	$("#searchForm").submit();
+    });
+    
+    	//chart
+    	var MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        
+        var randomScalingFactor = function() {
+            return Math.round(Math.random() * 100);
+            //return 0;
+        };
+        var randomColorFactor = function() {
+            return Math.round(Math.random() * 255);
+        };
+        var randomColor = function(opacity) {
+            return 'rgba(' + randomColorFactor() + ',' + randomColorFactor() + ',' + randomColorFactor() + ',' + (opacity || '.3') + ')';
+        };
+        
+        
+        var setMaxY = function(){
+        	 var max = 0;
+        	 $.each(config.data.datasets, function(i, datasets) {
+               	$.each(datasets.data, function(i, value) {
+                    if(value > max){
+                    	max = value;
+                    }
+             	});
+             });
+             if(max>0){
+             	config.options.scales.yAxes[0].ticks.suggestedMax = max;
+             }
+        }
+         
+        $.ajax({
+            url:"@{Query.ajaxQuery}",
+            dataType:"json", //返回的数据类型,text 或者 json数据，建议为json
+            type:"post", //传参方式，get 或post
+            data:{gameId:gameId,ch:ch,date:date,caller:caller,appKey:appKey,type:type},
+            error: function(msg){   
+            	console.log(msg);
+            },
+            success: function(result) {
+                
+              if (config.data.datasets.length >= 0) {
+                config.data.labels.push(result.date);
+                $.each(result.data, function(i, data) {
+                	var borderColor = randomColor(0.4);
+                	var backgroundColor = randomColor(0.5);
+                    config.data.datasets.push({label:data.label,data:[data.value],fill:true,
+                    borderColor: borderColor,
+	                backgroundColor: backgroundColor,
+	                pointBorderColor: borderColor,
+	                pointBackgroundColor: backgroundColor,
+	                pointBorderWidth: 1
+                    });
+                });
+                
+                setMaxY();
+                 
+				//config.options.scales.yAxes[0].ticks.suggestedMax =10;
+                window.myLine.update();
+            	}
+            }
+	    });
+ 
+        
+        var config = {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [
+                /*{
+                    label: "My First dataset",
+                    data: [randomScalingFactor(), randomScalingFactor(), randomScalingFactor(), randomScalingFactor(), randomScalingFactor(), randomScalingFactor(), randomScalingFactor()],
+                    fill: false,
+                    borderDash: [5, 5],
+                }, {
+                    hidden: true,
+                    label: 'hidden dataset',
+                    data: [randomScalingFactor(), randomScalingFactor(), randomScalingFactor(), randomScalingFactor(), randomScalingFactor(), randomScalingFactor(), randomScalingFactor()],
+                }, {
+                    label: "My Second dataset",
+                    data: [randomScalingFactor(), randomScalingFactor(), randomScalingFactor(), randomScalingFactor(), randomScalingFactor(), randomScalingFactor(), randomScalingFactor()],
+                }*/
+                
+                ]
+            },
+            options: {
+                responsive: true,
+                title:{
+                    display:true,
+                    text:'线性趋势图'
+                },
+                tooltips: {
+                    mode: 'label',
+                    callbacks: { 
+                    }
+                },
+                hover: {
+                    mode: 'dataset'
+                },
+                scales: {
+                    xAxes: [{
+                        display: true,
+                        scaleLabel: {
+                            show: true,
+                            labelString: 'Month'
+                        }
+                    }],
+                    yAxes: [{
+                        display: true,
+                        scaleLabel: {
+                            show: true,
+                            labelString: 'Value'
+                        },
+                        ticks: {
+                            suggestedMin: 0,
+                            suggestedMax: 100,
+                        }
+                    }]
+                }
+            }
+        };
+        window.onload = function() {
+            var ctx = document.getElementById("canvas").getContext("2d");
+            window.myLine = new Chart(ctx, config);
+        };
+        
+</script>
+</body>

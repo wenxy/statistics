@@ -9,6 +9,7 @@ import constants.MQInstance;
 import interfaces.IReadWrite;
 import jws.Logger;
 import utils.DateUtil;
+import utils.NumberUtil;
 import utils.RedisUtil;
 /**
  * 用户价值
@@ -44,10 +45,11 @@ public class Pro_default_LTV_KPI extends IReadWrite{
 			
 			StringBuffer sb = new StringBuffer();
 			for(int i=0;i<result.length;i++){
+				String d = NumberUtil.format(Double.parseDouble(result[i]));
 				if(i == result.length-1){
-					sb.append(result[i]);
+					sb.append(d);
 				}else{
-					sb.append(result[i]).append(",");
+					sb.append(d).append(",");
 				}
 			}
 			
@@ -57,7 +59,16 @@ public class Pro_default_LTV_KPI extends IReadWrite{
 		}
 		return "0,0,0,0,0,0,0,0,0,0";
 	}
-	
+	/**
+	 * 获取某天注册用户，多少天后的总注册数
+	 * @param caller
+	 * @param date
+	 * @param gameId
+	 * @param ch
+	 * @param afterDays
+	 * @return
+	 * @throws Exception
+	 */
 	private double getAmountByAfterDay(String caller,String date, int gameId, String ch,int afterDays) throws Exception{
 		try{
 			double result = 0;

@@ -21,15 +21,22 @@ public class Pro_default_PAYUSER_KPI extends IReadWrite{
 			String skey = RedisUtil.apply(caller,date, ch, gameId, KPI.PAYUSER_KPI.raw());
 			String ckey = RedisUtil.apply(caller,date, ch, gameId, Action.PAY_ACTION.raw(),KPI.PAYUSER_KPI.raw());//计算key caculateKey
 			
-			String redisResult = readFromRedis(skey);
-			if(!StringUtils.isEmpty(redisResult) && !isToday(date)){//查询当天的话，不走缓存，因为数据在实时变化ing
-				return redisResult;
+			long count = 0;
+			try{
+				String redisResult = readFromRedis(skey);
+				count = Long.parseLong(redisResult);
+			}catch(NumberFormatException e){
+				
+			}
+			
+ 			if(count>0 && !isToday(date)){//查询当天的话，不走缓存，因为数据在实时变化ing
+ 				return String.valueOf(count);
 			}
 			
 			File file = getReadStoreFile(caller,date,gameId,ch,Action.PAY_ACTION.raw(),KPI.PAYUSER_KPI.raw());
 
 			//计算数 
-			long count = caculateSingleSize(file,ckey,MQInstance.BASE);
+			count = caculateSingleSize(file,ckey,MQInstance.BASE);
 			writeToRedis(skey,String.valueOf(count),KPI_CACHE_SEC);
 			
 			return String.valueOf(count);

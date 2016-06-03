@@ -11,6 +11,7 @@ import constants.KPI;
 import constants.MQInstance;
 import interfaces.IReadWrite;
 import jws.Logger;
+import utils.NumberUtil;
 import utils.RedisUtil;
 /**
  * 人均付費 元
@@ -55,12 +56,12 @@ public class Pro_default_ARPPU_KPI extends IReadWrite{
 				payCount = caculateSingleSize(file,ckey,MQInstance.BASE);
 				writeToRedis(skey,String.valueOf(payCount),KPI_CACHE_SEC);
 			}
-			return String.valueOf(payTotal/payCount);
+			return String.valueOf(NumberUtil.format(payTotal/payCount));
 			
 		}catch(Exception e){
 			Logger.error(e, "");
 		}
-		return "0";
+		return "0.00";
 	} 
 	/*public static void main(String[] args){
 		double x = 3004.43;

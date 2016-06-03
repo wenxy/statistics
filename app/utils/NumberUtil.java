@@ -1,5 +1,6 @@
 package utils;
 
+import java.text.NumberFormat;
 import java.util.regex.Pattern;
 
 /**
@@ -61,5 +62,36 @@ public class NumberUtil {
         } catch (Exception e) {
             return def;
         }
+    }
+    
+    /**
+     * 保留小数点后4位
+     * @param d
+     * @return
+     */
+    public static String format(double d){
+    	if(d == 0){
+    		return "0.00";
+    	}
+    	java.text.DecimalFormat  df=new   java.text.DecimalFormat("##.####");   
+    	return df.format(d);
+    }
+    
+    /**
+     * 百分数
+     * @param d
+     * @return
+     */
+    public static String formatP(double d){
+    	if(d == 0){
+    		return "0%";
+    	}
+    	NumberFormat nt = NumberFormat.getPercentInstance();
+    	nt.setMinimumFractionDigits(2);
+    	return nt.format(d);
+    }
+    
+    public static void main(String[] args){
+    	System.out.print(formatP(0.0002));
     }
 }

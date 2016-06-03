@@ -11,6 +11,7 @@ import constants.KPI;
 import constants.MQInstance;
 import interfaces.IReadWrite;
 import jws.Logger;
+import utils.NumberUtil;
 import utils.RedisUtil;
 /**
  * 人均付費 元
@@ -58,12 +59,12 @@ public class Pro_default_ARPU_KPI extends IReadWrite{
 			if(loginCount == 0){
 				return "0";
 			}
-			return String.valueOf(payTotal/loginCount);
+			return String.valueOf(NumberUtil.format(payTotal/loginCount));
 			
 		}catch(Exception e){
 			Logger.error(e, "");
 		}
-		return "0";
+		return "0.00";
 	} 
 	/*public static void main(String[] args){
 		double x = 3004.43;

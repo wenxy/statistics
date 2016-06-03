@@ -9,6 +9,7 @@ import constants.KPI;
 import constants.MQInstance;
 import interfaces.IReadWrite;
 import jws.Logger;
+import utils.NumberUtil;
 import utils.RedisUtil;
 
 public class Pro_default_OLDPAYRATE_KPI extends IReadWrite{
@@ -59,7 +60,7 @@ public class Pro_default_OLDPAYRATE_KPI extends IReadWrite{
 			}
 			
 			 
-			return String.valueOf((double)oldpaycount/oldLogincount);
+			return String.valueOf(NumberUtil.formatP((double)oldpaycount/oldLogincount));
 		}catch(Exception e){
 			Logger.error(e, "0");
 		}

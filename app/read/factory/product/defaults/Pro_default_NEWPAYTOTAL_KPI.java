@@ -8,6 +8,7 @@ import constants.Action;
 import constants.KPI;
 import interfaces.IReadWrite;
 import jws.Logger;
+import utils.NumberUtil;
 import utils.RedisUtil;
 
 public class Pro_default_NEWPAYTOTAL_KPI extends IReadWrite{
@@ -25,7 +26,7 @@ public class Pro_default_NEWPAYTOTAL_KPI extends IReadWrite{
 			String line = readLine(file); 
  			writeToRedis(skey,line.trim(),KPI_CACHE_SEC);
 			
-			return StringUtils.isEmpty(line)?"0":line.trim();
+			return StringUtils.isEmpty(line)?"0":NumberUtil.format(Double.parseDouble(line.trim()));
 		}catch(Exception e){
 			Logger.error(e, "0");
 		}

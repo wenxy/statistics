@@ -37,11 +37,11 @@ public class UcmqWorker extends WorkerInvocation{
 			Logger.error(e1, "");
 			return;
 		}
-		/**
+		 
 		if(!check(message)){
 			Logger.error("UcmqWorker.onTask check message invalid %s", message);
 			return ;
-		}*/
+		}
 		//先根据业务获取是否定义特殊实现，找不到则使用默认工厂
 		String caller = message.get("caller").getAsString();
 		String action = message.get("action").getAsString();

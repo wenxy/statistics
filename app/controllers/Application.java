@@ -12,4 +12,6 @@ public class Application extends Controller {
     public static void error() {
     	throw new RuntimeException("a test exception");
     }
+    
+    
 }
