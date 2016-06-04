@@ -17,10 +17,18 @@ public class Pro_default_NEWPAYTOTAL_KPI extends IReadWrite{
 		try{
 			String skey = RedisUtil.apply(caller,date, ch, gameId, KPI.NEWPAYTOTAL_KPI.raw());
  
-			String redisResult = readFromRedis(skey);
-			if(!StringUtils.isEmpty(redisResult) && !isToday(date)){//查询当天的话，不走缓存，因为数据在实时变化ing
-				return redisResult;
+			double amount = 0;
+			try{
+				String redisResult = readFromRedis(skey);
+				amount = Double.parseDouble(redisResult);
+			}catch(NumberFormatException e){
+				
 			}
+			
+ 			if(amount>0 && !isToday(date)){//查询当天的话，不走缓存，因为数据在实时变化ing
+				return NumberUtil.format(amount);
+			}
+			
 			
 			File file = getReadStoreFile(caller,date,gameId,ch,Action.PAY_ACTION.raw(),KPI.NEWPAYTOTAL_KPI.raw());
 			String line = readLine(file); 
